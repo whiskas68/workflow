@@ -9,10 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 @SpringBootTest
 public class PodApiTest {
@@ -20,11 +18,13 @@ public class PodApiTest {
     @Autowired
     KafkaTemplate kafkaTemplate;
 
-    @Test
-    public void testPushJobToKafkaSerial() throws IOException,InterruptedException{
-        KubernetesClient client = K8sClient.getClient();
+    @Autowired
+    K8sClient k8sClient;
 
-        for(Integer id=30;id<39;id++){
+    @Test
+    public void testPushJobToKafkaSerial(){
+
+        for(Integer id=30;id<31;id++){
             List<String> args = new ArrayList<>();
             args.add(id.toString());
             Job job = createJob("job"+id,"busybox:1.28.4","sleep",args);
@@ -33,8 +33,8 @@ public class PodApiTest {
     }
 
     @Test
-    public void testCreatePod() throws IOException {
-        KubernetesClient client = K8sClient.getClient();
+    public void testCreatePod() {
+        KubernetesClient client = k8sClient.getClient();
         List<String> args = new ArrayList<>();
         args.add("3");
         Job job = createJob("job1","busybox:1.28.4","sleep",args);

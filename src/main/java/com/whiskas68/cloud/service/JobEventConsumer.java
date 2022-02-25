@@ -9,6 +9,7 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
@@ -20,11 +21,14 @@ import java.util.List;
 @Component
 public class JobEventConsumer {
 
+    @Autowired
+    private K8sClient k8sclient;
+
     @KafkaListener(topics = {"job-parallel"},groupId = "job-1",clientIdPrefix = "jobClient")
     public void execJobsFromKafkaParallel(ConsumerRecord<?,?> record, Acknowledgment acknowledgment) throws IOException{
+        KubernetesClient client = k8sclient.getClient();
         Job job = (Job) record.value();
         String metaName = job.getMetadata().getName();
-        KubernetesClient client = K8sClient.getClient();
         client.batch().jobs().inNamespace("default").createOrReplace(job);
         log.info("K8s创建: ["+metaName+"]");
         acknowledgment.acknowledge();
@@ -32,10 +36,10 @@ public class JobEventConsumer {
 
     @KafkaListener(topics = {"job-serial"},groupId = "job-1",clientIdPrefix = "jobClient")
     public void execJobsFromKafkaSerial(ConsumerRecord<?,?> record, Acknowledgment acknowledgment) throws IOException,InterruptedException{
+        KubernetesClient client = k8sclient.getClient();
         Boolean isCompleted = false;
         Job job = (Job) record.value();
         String metaName = job.getMetadata().getName();
-        KubernetesClient client = K8sClient.getClient();
         client.batch().jobs().inNamespace("default").createOrReplace(job);
         log.info("K8s创建: ["+metaName+"]");
         while(!isCompleted){

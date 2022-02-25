@@ -17,7 +17,6 @@ kubernetes:
       master-url: https://10.10.10.131:6443
       kube-config: C:\Users\oper\IdeaProjects\workflow\src\main\resources\kubeconfig\config
       token: 7znlvu.cfno8z3yit4meue5
-
 spring:
   application:
     name: WOEKFLOW
@@ -45,7 +44,7 @@ spring:
       missing-topics-fatal: false # 消费监听接口监听的主题不存在时，默认会报错。所以通过设置为 false ，解决报错
       ack-mode: MANUAL
 
-
 logging:
   level:
     com.whiskas68.cloud: INFO
+
