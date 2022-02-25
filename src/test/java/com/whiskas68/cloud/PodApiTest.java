@@ -54,6 +54,7 @@ public class PodApiTest {
                     .withName("job")
                     .withImage(image)
                     .withCommand(command)
+                    .withImagePullPolicy("IfNotPresent")
                     .withArgs(args)
                     .endContainer()
                     .withRestartPolicy("Never")
